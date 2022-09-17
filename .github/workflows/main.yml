@@ -22,6 +22,16 @@ jobs:
           python -m flake8
           cd infra_project/
           python manage.py test
+  send_message_test:
+    runs-on: ubuntu-latest
+    needs: tests
+    steps:
+      - name: send message
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: ${{ github.workflow }} тестирование успешно завершено.
   build_and_push_to_docker_hub:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
@@ -41,6 +51,16 @@ jobs:
         with:
           push: true
           tags: viator3m/infra_actions:latest
+  send_message_build:
+    runs-on: ubuntu-latest
+    needs: build_and_push_to_docker_hub
+    steps:
+      - name: send message
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: ${{ github.workflow }} сборка выполнена.
   deploy:
     runs-on: ubuntu-latest
     needs: build_and_push_to_docker_hub
@@ -65,14 +85,4 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: ${{ github.workflow }} успешно выполнен!
-  send_message_build:
-    runs-on: ubuntu-latest
-    needs: build_and_push_to_docker_hub
-    steps:
-      - name: send message
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_TO }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: ${{ github.workflow }} build успешно выполнен!
+          message: ${{ github.workflow }} деплой успешно выполнен!
