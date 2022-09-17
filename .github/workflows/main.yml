@@ -3,6 +3,22 @@ name: Django-app workflow
 on: [push]
 
 jobs:
+  send_message_start:
+    runs-on: ubuntu-latest
+    steps:
+      - name: send message on push
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ${{ github.actor }} создал коммит:
+            Сообщение коммита: ${{ github.event.commits[0].message }}
+            
+            Репо: ${{ github.repository }}
+            
+            Посмотреть изменения: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+
   tests:
     runs-on: ubuntu-latest
 
